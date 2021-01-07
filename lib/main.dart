@@ -35,28 +35,33 @@ class TabBarDemo extends StatelessWidget {
 }
 class TrafficCounter extends StatefulWidget {
   TrafficCounter({Key key, this.title, this.icon}) : super(key: key);
-  String title;
-  IconData icon;
+  final String title;
+  final IconData icon;
   @override
   _TrafficCounter createState() => new _TrafficCounter();
 }
 class _TrafficCounter extends State<TrafficCounter> {
-  int _counter = 0;
+  int _counter;
+    @override
+  void initState() {
+    super.initState();
+    _loadCounter(widget.title);
+  }
 
-  void _incrementCounter(String type)  {
-    setState(() async {
-      final prefs = await SharedPreferences.getInstance();
-      int curval = prefs.getInt(type);
-      prefs.setInt(type, curval+1);
+  void _incrementCounter(String type)  async{
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _counter = (prefs.getInt(type) ?? 0) + 1;
+      prefs.setInt(type, _counter);
+    });
+  }
+  _loadCounter(String type) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _counter = (prefs.getInt(type) ?? 0);
     });
   }
 
-  void _getCounter(String type)  {
-    setState(() async {
-      final prefs = await SharedPreferences.getInstance();
-      _counter = prefs.getInt(type);
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
