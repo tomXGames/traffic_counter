@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:confirm_dialog/confirm_dialog.dart';
+
+
 void main() {
   runApp(TabBarDemo());
 }
@@ -19,7 +22,7 @@ class TabBarDemo extends StatelessWidget {
                 Tab(icon: Icon(Icons.directions_bike)),
               ],
             ),
-            title: Text('Tabs Demo'),
+            title: Text('Traffic Counter'),
           ),
           body: TabBarView(
             children: [
@@ -55,13 +58,26 @@ class _TrafficCounter extends State<TrafficCounter> {
       prefs.setInt(type, _counter);
     });
   }
-  _loadCounter(String type) async {
+  void _loadCounter(String type) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       _counter = (prefs.getInt(type) ?? 0);
     });
   }
-
+  void _resetCounter(String type) async {
+    final prefs = await SharedPreferences.getInstance();
+    if (await confirm(context,
+        title: Text('Confirm'),
+        content: Text('Do you really want to reset the counter?'),
+        textOK: Text('Yes'),
+        textCancel: Text('No'),
+    )) {
+      setState(() {
+        _counter = 0;
+        prefs.setInt(type, 0);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -102,11 +118,23 @@ class _TrafficCounter extends State<TrafficCounter> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _incrementCounter(widget.title),
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      floatingActionButtonLocation:FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                FloatingActionButton(
+                  onPressed: ()=> _resetCounter(widget.title),
+                  child: Icon(Icons.replay),),
+                FloatingActionButton(
+                  tooltip: 'Increment',
+                  onPressed: () => _incrementCounter(widget.title),
+                  child: Icon(Icons.add),
+                )
+              ],
+                    ),
+          )
     );
   }
 }
