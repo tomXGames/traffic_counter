@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:confirm_dialog/confirm_dialog.dart';
+import 'package:flutter_grid_button/flutter_grid_button.dart';
 
 
 void main() {
@@ -45,7 +46,7 @@ class TrafficCounter extends StatefulWidget {
 }
 class _TrafficCounter extends State<TrafficCounter> {
   int _counter;
-    @override
+  @override
   void initState() {
     super.initState();
     _loadCounter(widget.title);
@@ -56,6 +57,15 @@ class _TrafficCounter extends State<TrafficCounter> {
     setState(() {
       _counter = (prefs.getInt(type) ?? 0) + 1;
       prefs.setInt(type, _counter);
+    });
+  }
+    void _decreaseCounter(String type)  async{
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _counter = (prefs.getInt(type) ?? 0) - 1;
+      if((_counter >= 1)){
+        prefs.setInt(type, _counter);
+      }
     });
   }
   void _loadCounter(String type) async {
@@ -87,54 +97,50 @@ class _TrafficCounter extends State<TrafficCounter> {
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
-    return Scaffold(
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Icon(
-              widget.icon,
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButtonLocation:FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Padding(
+            padding: const EdgeInsets.all(18.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                FloatingActionButton(
-                  onPressed: ()=> _resetCounter(widget.title),
-                  child: Icon(Icons.replay),),
-                FloatingActionButton(
-                  tooltip: 'Increment',
-                  onPressed: () => _incrementCounter(widget.title),
-                  child: Icon(Icons.add),
-                )
+              Container( child: Icon(
+              widget.icon,
+              ), height: 50, ),
+              Container(child: Text(
+                '$_counter',
+                style: Theme.of(context).textTheme.headline4,
+              ), height: 50, ),  
+              Container( child:GridButton(
+              borderWidth: 2,
+              borderColor: Colors.white10,
+              enabled: true,
+              onPressed: (dynamic val) {
+                switch(val) { 
+                    case "+": {  _incrementCounter(widget.title); } 
+                    break; 
+                  
+                    case "-": {  _decreaseCounter(widget.title); } 
+                    break; 
+                  
+                    case "r": {  _resetCounter(widget.title); } 
+                    break; 
+                  
+                    default: { _incrementCounter(widget.title); } 
+                    break; 
+                } 
+              },
+              items: [
+                [
+                  GridButtonItem(title: '+', borderRadius: 7, color: Colors.blue, value: "+", textStyle: TextStyle(fontSize: 20)),
+                ],
+                [
+                  GridButtonItem(title: "-", borderRadius: 7, color: Colors.red, value: "-", textStyle: TextStyle(fontSize: 20)),
+                  GridButtonItem(title: "Reset", borderRadius: 7, color: Colors.black, value: "r", textStyle: TextStyle(fontSize: 20, color: Colors.white)),
+                ]
               ],
-                    ),
+            ), height: 200,)]
           )
-    );
+        );
   }
 }

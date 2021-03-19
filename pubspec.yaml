@@ -26,6 +26,12 @@ dependencies:
   shared_preferences: ^0.5.12+4
   confirm_dialog: 0.1.1
   flutter_grid_button: ^1.1.8
+  flutter_launcher_icons: ^0.8.1
+  
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon/icon.png"
 
 
   # The following adds the Cupertino Icons font to your application.
